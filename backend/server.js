@@ -1,21 +1,24 @@
 const express = require('express');
 const { exec } = require('child_process');
 const cors = require('cors');
-const fs = require('fs');
-const https = require('https');
+const path = require('path');
+
 
 const app = express();
-const port = 3001;
+const port = process.env.PORT || 8080;
 
 app.use(cors());
+
+// Define the path to the scripts folder
+const scriptsDir = path.join(__dirname, 'scripts');
 
 app.get('/', (req, res) => {
   res.send('Hello World!');
 });
 
-app.get('/run-script', (req, res) => {
-  //const scriptPath = 'C:\\Users\\natef\\OneDrive\\Desktop\\Projects\\NWGDefRev\\backend\\script.py'; //'C:\\Users\\natef\\OneDrive\\Desktop\\Projects\\NWGDefRev\\backend\\script.py'
-  exec(`python3 'script.py'`, (err, stdout, stderr) => {
+app.get('/test-script', (req, res) => {
+  const scriptPath = path.join(scriptsDir, 'script.py');
+  exec(`python "${scriptPath}"`, (err, stdout, stderr) => {
     if (err) {
       console.error(`Error: ${err.message}`);
       return res.status(500).send(`Error: ${err.message}`);
@@ -29,11 +32,9 @@ app.get('/run-script', (req, res) => {
   });
 });
 
-app.get('/run-sheets', (req, res) => {
-  //const activateEnv = 'C:\\Users\\natef\\OneDrive\\Desktop\\Projects\\NWGDefRev\\venv\\Scripts\\activate &&';
-  //const scriptPath = 'C:\\Users\\natef\\OneDrive\\Desktop\\Projects\\NWGDefRev\\sheets.py';
-
-  exec(`python3 'sheets.py'`, (err, stdout, stderr) => {
+app.get('/run-schedule', (req, res) => {
+  const scriptPath = path.join(scriptsDir, 'recognition_schedule.py');
+  exec(`python "${scriptPath}"`, (err, stdout, stderr) => {
     if (err) {
       console.error(`Error: ${err.message}`);
       return res.status(500).send(`Error: ${err.message}`);
@@ -47,8 +48,9 @@ app.get('/run-sheets', (req, res) => {
   });
 });
 
-app.get('/run-qb', (req, res) => {
-  exec(`python3 'sandboxqb.py'`, (err,stdout,stder) => {
+app.get('/contraction', (req, res) => {
+  const scriptPath = path.join(scriptsDir, 'contraction.py');
+  exec(`python "${scriptPath}"`, (err, stdout, stderr) => {
     if (err) {
       console.error(`Error: ${err.message}`);
       return res.status(500).send(`Error: ${err.message}`);
@@ -62,11 +64,39 @@ app.get('/run-qb', (req, res) => {
   });
 });
 
-const httpsOptions = {
-  key: fs.readFileSync('key.pem'),
-  cert: fs.readFileSync('cert.pem')
-};
+app.get('/expansion', (req, res) => {
+  const scriptPath = path.join(scriptsDir, 'expansion.py');
+  exec(`python "${scriptPath}"`, (err, stdout, stderr) => {
+    if (err) {
+      console.error(`Error: ${err.message}`);
+      return res.status(500).send(`Error: ${err.message}`);
+    }
+    if (stderr) {
+      console.error(`Stderr: ${stderr}`);
+      return res.status(500).send(`Stderr: ${stderr}`);
+    }
+    console.log(`Stdout: ${stdout}`);
+    res.send(`Output: ${stdout}`);
+  });
+});
 
-https.createServer(httpsOptions, app).listen(port, () => {
-  console.log(`HTTPS Server is running on https://localhost:${port}`);
+app.get('/renewal', (req, res) => {
+  const scriptPath = path.join(scriptsDir, 'renewal.py');
+  exec(`python "${scriptPath}"`, (err, stdout, stderr) => {
+    if (err) {
+      console.error(`Error: ${err.message}`);
+      return res.status(500).send(`Error: ${err.message}`);
+    }
+    if (stderr) {
+      console.error(`Stderr: ${stderr}`);
+      return res.status(500).send(`Stderr: ${stderr}`);
+    }
+    console.log(`Stdout: ${stdout}`);
+    res.send(`Output: ${stdout}`);
+  });
+});
+
+
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
